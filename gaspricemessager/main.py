@@ -1,10 +1,10 @@
 import os
 from twilio.rest import Client
 from dotenv import load_dotenv
-from controllers.GasScrapper import GasScrapper
+from controllers.GasScraper import GasScraper
 load_dotenv('../.env')
 
-scrapper = GasScrapper(78732)
+scrapper = GasScraper()
 
 account_sid = os.environ['ACCOUNT_SID']
 auth_token = os.environ['AUTH_TOKEN']

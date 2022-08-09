@@ -1,2 +1,4 @@
 tests/
 .env
+test.py
+__pycache__/
