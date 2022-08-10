@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 import cfscrape
 
+
+
 class GasScraper:
     def __init__(self, zipcode):
         self.zipcode = zipcode
@@ -8,13 +10,14 @@ class GasScraper:
             "div": "GenericStationListItem-module__stationListItem___3Jmn4",
             "h3": "header__header3___1b1oq header__header___1zII0 header__midnight___1tdCQ header__snug___lRSNK StationDisplay-module__stationNameHeader___1A2q8",
             "price": "text__xl___2MXGo text__left___1iOw3 StationDisplayPrice-module__price___3rARL",
+            "address": "StationDisplay-module__address___2_c7v",
         }
         self._create()
 
     def _create(self):
         self.soup = self.make_soup(self.zipcode)
         self.prices = self._get_prices()
-        self.price_values = list(self.prices.values())
+        self.price_values = list(map(lambda x: x["price"], self.prices.values()))
 
     def make_soup(self, zipcode):
         url = (
@@ -33,10 +36,14 @@ class GasScraper:
             h3 = div.find("h3", class_=self.ids["h3"])
             gasStation = h3.a.text
             price = div.find("span", class_=self.ids["price"]).text
+            address = div.find("div", class_=self.ids["address"]).text
 
             for i in range(len_divs):
                 if price != "---":
-                    prices[gasStation] = float(price[1:])
+                    prices[gasStation] = {
+                        "price": float(price[1:]),
+                        "address": address,
+                    }
 
         return prices
 
@@ -44,13 +51,31 @@ class GasScraper:
         maximum = max(self.price_values)
         index = self.price_values.index(maximum)
         station = list(self.prices.keys())[index]
-        return {station: maximum}
+        address = self.prices[station]["address"]
+        address_link = f"https://www.google.com/maps/search/?api=1&query={address.replace(' ', '+')}"
+
+        return {
+            station: {
+                "price": maximum,
+                "address": address,
+                "address_link": address_link,
+            }
+        }
 
     def get_lowest_price(self):
         minimum = min(self.price_values)
         index = self.price_values.index(minimum)
         station = list(self.prices.keys())[index]
-        return {station: minimum}
+        address = self.prices[station]["address"]
+        address_link = f"https://www.google.com/maps/search/?api=1&query={address.replace(' ', '+')}"
+
+        return {
+            station: {
+                "price": minimum,
+                "address": address,
+                "address_link": address_link,
+            }
+        }
 
     def get_average_price(self):
         average = round(sum(self.price_values) / len(self.price_values), 2)
@@ -67,5 +92,7 @@ if __name__ == "__main__":
     scraper = GasScraper(zipcode)
 
     print(scraper.get_lowest_price())
+    print()
     print(scraper.get_highest_price())
+    print()
     print(scraper.get_average_price())
