@@ -1,20 +1,38 @@
 import os
 from twilio.rest import Client
 from dotenv import load_dotenv
-from controllers.GasScraper import GasScraper
-load_dotenv('../.env')
+from util.GasScraper import GasScraper
 
-scrapper = GasScraper()
+load_dotenv("../.env")
 
-account_sid = os.environ['ACCOUNT_SID']
-auth_token = os.environ['AUTH_TOKEN']
-number = os.environ['NUMBER']
+
+def create_message(bot):
+    lowest = bot.get_lowest_price()
+    station = list(lowest.keys())[0]
+    data = lowest[station]
+    price = data["price"]
+    address = data["address"]
+    address_link = data["address_link"]
+    message = f"The cheapest gas is at {station} at ${price}\n\nThe address is {address}\n{address_link}"
+
+    return message
+
+
+def send_message(messager, message, zipcode, from_number, to_number):
+    message = messager.messages.create(body=message, from_=from_number, to=to_number)
+
+zipcode = 78726
+
+
+scraper = GasScraper(zipcode)
+
+message = create_message(scraper)
+
+account_sid = os.environ["ACCOUNT_SID"]
+auth_token = os.environ["AUTH_TOKEN"]
+number = os.environ["NUMBER"]
 client = Client(account_sid, auth_token)
 
-message = client.messages.create(
-    body='I\'m watching you',
-    from_=number,
-    to='+15127014145'
-  )
+send_message(client, message, zipcode, number, "+15127014145")
 
-print(message.sid)
+
