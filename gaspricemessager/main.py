@@ -18,7 +18,7 @@ def create_message(bot):
     return message
 
 
-def send_message(messager, message, zipcode, from_number, to_number):
+def send_message(messager, message, from_number, to_number):
     message = messager.messages.create(body=message, from_=from_number, to=to_number)
 
 zipcode = 78726
@@ -33,6 +33,9 @@ auth_token = os.environ["AUTH_TOKEN"]
 number = os.environ["NUMBER"]
 client = Client(account_sid, auth_token)
 
-send_message(client, message, zipcode, number, "+15127014145")
+send_message(client, message, number, "+15127014145")
+
+
+# When I make the loop make sure I put in time.sleep() so it doesn't rate limit me.
 
 
