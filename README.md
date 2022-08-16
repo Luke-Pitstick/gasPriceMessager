@@ -8,7 +8,7 @@ in the folder run
 
 `poetry install`
 
-than create a .env file with the follwing format
+than create a .env file with the following format
 
 ```
 ACCOUNT_SID = [twilio account sid]
