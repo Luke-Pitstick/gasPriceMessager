@@ -12,14 +12,14 @@ class GasScraper:
             "price": "text__xl___2MXGo text__left___1iOw3 StationDisplayPrice-module__price___3rARL",
             "address": "StationDisplay-module__address___2_c7v",
         }
-        self._create()
+        self.__create()
 
-    def _create(self):
-        self.soup = self._make_soup(self.zipcode)
-        self.prices = self._create_prices()
+    def __create(self):
+        self.soup = self.__make_soup(self.zipcode)
+        self.prices = self.__create_prices()
         self.price_values = list(map(lambda x: x["price"], self.prices.values()))
 
-    def _make_soup(self, zipcode):
+    def __make_soup(self, zipcode):
         url = (
             f"https://www.gasbuddy.com/home?search={zipcode}&fuel=1&maxAge=0&method=all"
         )
@@ -27,7 +27,7 @@ class GasScraper:
         html = scrapper.get(url).content
         return BeautifulSoup(html, "lxml")
 
-    def _create_prices(self):
+    def __create_prices(self):
         divs = self.soup.findAll("div", class_=self.ids["div"])
         len_divs = len(divs)
         prices = {}
