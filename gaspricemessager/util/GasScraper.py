@@ -15,11 +15,11 @@ class GasScraper:
         self._create()
 
     def _create(self):
-        self.soup = self.make_soup(self.zipcode)
-        self.prices = self._get_prices()
+        self.soup = self._make_soup(self.zipcode)
+        self.prices = self._create_prices()
         self.price_values = list(map(lambda x: x["price"], self.prices.values()))
 
-    def make_soup(self, zipcode):
+    def _make_soup(self, zipcode):
         url = (
             f"https://www.gasbuddy.com/home?search={zipcode}&fuel=1&maxAge=0&method=all"
         )
@@ -27,7 +27,7 @@ class GasScraper:
         html = scrapper.get(url).content
         return BeautifulSoup(html, "lxml")
 
-    def _get_prices(self):
+    def _create_prices(self):
         divs = self.soup.findAll("div", class_=self.ids["div"])
         len_divs = len(divs)
         prices = {}
@@ -46,6 +46,9 @@ class GasScraper:
                     }
 
         return prices
+        
+    def get_prices(self):
+        return self.prices
 
     def get_highest_price(self):
         maximum = max(self.price_values)
